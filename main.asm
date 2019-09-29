@@ -1,5 +1,5 @@
 
-%define  WriteFileDescriptor  4
+%define  ReadFileDescriptor  0
 
 section .data
 	NUMCELLS: dd 9
@@ -45,7 +45,7 @@ printArrayLine:
 	mov eax, BOARD
 	push dword eax
 	push dword 1
-	mov eax, WriteFileDescriptor
+	mov eax, 4 
 	sub esp, 4
 	int 0x80	
 	add esp, 16
@@ -64,6 +64,15 @@ printNewLine:
 	sub esp, 4
 	int 0x80
 	add esp, 16
+	ret
+
+readInput:
+	push dword 1
+	push dword INPT
+	push dword ReadFileDescriptor
+	mov eax, 3
+	int 0x80
+	add esp,16
 	ret
 
 finish:
