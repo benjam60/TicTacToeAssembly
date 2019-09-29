@@ -1,3 +1,6 @@
+
+%define  WriteFileDescriptor  4
+
 section .data
 	NUMCELLS: dd 9
 	NUMROWS: dd 3
@@ -42,7 +45,7 @@ printArrayLine:
 	mov eax, BOARD
 	push dword eax
 	push dword 1
-	mov eax, 4
+	mov eax, WriteFileDescriptor
 	sub esp, 4
 	int 0x80	
 	add esp, 16
@@ -54,7 +57,7 @@ printArrayLine:
 
 printNewLine:
 	;Print new line after the output 
-	mov eax, 4
+	mov eax, WriteFileDescriptor
 	push dword NEWLINELENGTH
 	push dword NEWLINE
 	push dword 1
