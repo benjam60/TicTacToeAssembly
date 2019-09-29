@@ -77,6 +77,13 @@ readInput:
 	add esp,16
 	ret
 
+updateBoard:
+	mov eax, 0
+	mov al, [INPUT]
+	mov ebx, BOARD
+	add eax, BOARD
+	mov [eax], 'X'
+
 finish:
 	push dword 0
 	mov eax, 1
