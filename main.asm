@@ -21,7 +21,8 @@ start:
 	mov esi, 0
 	call initializeBoard
 	call printBoard
-	jmp gameLoop
+	call finish
+	;jmp gameLoop
 
 gameLoop:
 	call readInput
