@@ -87,6 +87,7 @@ readInput:
 updateBoard:
 	mov eax, 0
 	mov al, [INPUT]
+	sub eax, 48 ; char to int
 	mov ebx, BOARD
 	add eax, ebx
 	mov byte [eax], 'X'
