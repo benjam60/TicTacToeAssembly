@@ -3,6 +3,9 @@ section .data
 	NUMROWS: dd 3
 	ROWSIZE: dd 3
 	EMPTY: dd 95
+	NEWLINE: db 0xa, 0xd
+	NEWLINELENGTH: equ $-NEWLINE
+
 section .bss
 	INPUT: resd 3
 	BOARD: resd 9	
@@ -41,13 +44,24 @@ printArrayLine:
 	push dword 1
 	mov eax, 4
 	sub esp, 4
-	int 0x80
+	int 0x80	
 	add esp, 16
+	call printNewLine
 	add esi, 1
-	cmp esi, edi
+       	cmp esi, edi
 	jne printArrayLine
 	ret 
 
+printNewLine:
+	;Print new line after the output 
+	mov eax, 4
+	push dword NEWLINELENGTH
+	push dword NEWLINE
+	push dword 1
+	sub esp, 4
+	int 0x80
+	add esp, 16
+	ret
 
 finish:
 	push dword 0
