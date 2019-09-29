@@ -20,9 +20,14 @@ start:
 	and esp, -16
 	mov esi, 0
 	call initializeBoard
-	call printArray
+	call printBoard
+	jmp gameLoop
+
+gameLoop:
 	call readInput
-	jmp finish
+	call updateBoard
+	call printBoard
+	jmp gameLoop
 
 initializeBoard:
 	mov edi, [NUMCELLS]
@@ -35,15 +40,17 @@ initializeBoard:
 	jne initializeBoard
 	ret
 
-printArray:
+printBoard:
 	mov esi, 0
 	mov edi, [NUMROWS]
-	call printArrayLine
+	call printBoardLine
 	ret
 
-printArrayLine:
+printBoardLine:
 	push dword [ROWSIZE]
-	mov eax, BOARD
+	mov eax, esi
+	imul eax, 3
+	add eax, BOARD 
 	push dword eax
 	push dword 1
 	mov eax, 4 
@@ -53,7 +60,7 @@ printArrayLine:
 	call printNewLine
 	add esi, 1
        	cmp esi, edi
-	jne printArrayLine
+	jne printBoardLine
 	ret 
 
 printNewLine:
@@ -81,8 +88,9 @@ updateBoard:
 	mov eax, 0
 	mov al, [INPUT]
 	mov ebx, BOARD
-	add eax, BOARD
-	mov [eax], 'X'
+	add eax, ebx
+	mov byte [eax], 'X'
+	ret
 
 finish:
 	push dword 0
