@@ -10,7 +10,7 @@ section .data
 	NEWLINELENGTH: equ $-NEWLINE
 
 section .bss
-	INPUT: resd 3
+	INPUT: resd 10
 	BOARD: resd 9	
 
 global start
@@ -21,8 +21,7 @@ start:
 	mov esi, 0
 	call initializeBoard
 	call printBoard
-	call finish
-	;jmp gameLoop
+	jmp gameLoop
 
 gameLoop:
 	call readInput
@@ -76,7 +75,7 @@ printNewLine:
 	ret
 
 readInput:
-	push dword 1
+	push dword 10
 	push dword INPUT
 	push dword ReadFileDescriptor
 	mov eax, 3
