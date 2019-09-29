@@ -21,6 +21,7 @@ start:
 	mov esi, 0
 	call initializeBoard
 	call printArray
+	call readInput
 	jmp finish
 
 initializeBoard:
@@ -57,7 +58,7 @@ printArrayLine:
 
 printNewLine:
 	;Print new line after the output 
-	mov eax, WriteFileDescriptor
+	mov eax, 4 
 	push dword NEWLINELENGTH
 	push dword NEWLINE
 	push dword 1
@@ -68,9 +69,10 @@ printNewLine:
 
 readInput:
 	push dword 1
-	push dword INPT
+	push dword INPUT
 	push dword ReadFileDescriptor
 	mov eax, 3
+	sub esp, 4
 	int 0x80
 	add esp,16
 	ret
