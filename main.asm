@@ -1,6 +1,11 @@
+section .data
+	NUMCELLS: dd 9
+	NUMROWS: dd 3
+	ROWSIZE: dd 3
+	EMPTY: dd 95
 section .bss
 	INPUT: resd 3
-	BOARD: resb 9	
+	BOARD: resd 9	
 
 global start
 
@@ -13,10 +18,10 @@ start:
 	jmp finish
 
 initializeBoard:
-	mov edi, 9
+	mov edi, [NUMCELLS]
 	mov eax, BOARD
 	add eax, esi
-	mov ebx, 95
+	mov ebx, [EMPTY]
 	mov [eax], ebx
 	add esi, 1
 	cmp esi, edi
@@ -25,12 +30,12 @@ initializeBoard:
 
 printArray:
 	mov esi, 0
-	mov edi, 3
+	mov edi, [NUMROWS]
 	call printArrayLine
 	ret
 
 printArrayLine:
-	push dword 3
+	push dword [ROWSIZE]
 	mov eax, BOARD
 	push dword eax
 	push dword 1
