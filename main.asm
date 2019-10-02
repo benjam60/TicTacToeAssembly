@@ -64,7 +64,6 @@ printBoardLine:
 	ret 
 
 printNewLine:
-	;Print new line after the output 
 	mov eax, 4 
 	push dword NEWLINELENGTH
 	push dword NEWLINE
