@@ -8,6 +8,7 @@ section .data
 	EMPTY: dd 95
 	NEWLINE: db 0xa, 0xd
 	NEWLINELENGTH: equ $-NEWLINE
+	WINNERMSG: db "Winner", 0
 
 section .bss
 	INPUT: resd 10
@@ -26,8 +27,37 @@ start:
 gameLoop:
 	call readInput
 	call updateBoard
+	call checkWinner
 	call printBoard
 	jmp gameLoop
+
+checkWinner:
+	mov eax, [BOARD]
+	and eax, 0x00FFFFFF ;get the first 3 characters
+	cmp eax, 0x00585858 ; compare to row of Xs
+	je winner
+	cmp eax, 0x004F4F4F ; compare to row of Os
+	je winner
+	call checkVerticalWinner
+	ret
+
+checkVerticalWinner:
+	mov eax, 0
+	mov al, [BOARD] ;get first column first row
+	shl eax, 8
+	mov al, [BOARD + 3] ;get first column 2nd row
+	shl eax, 8
+	mov al, [BOARD + 6] ;get first column 3rd row
+	cmp eax, 0x00585858
+	je winner
+	cmp eax, 0x004F4F4F
+	je winner
+	ret
+
+winner:
+	call printBoard
+	call printWinner
+	jmp finish
 
 initializeBoard:
 	mov edi, [NUMCELLS]
@@ -67,6 +97,16 @@ printNewLine:
 	mov eax, 4 
 	push dword NEWLINELENGTH
 	push dword NEWLINE
+	push dword 1
+	sub esp, 4
+	int 0x80
+	add esp, 16
+	ret
+
+printWinner:
+	mov eax, 4 
+	push dword 7 
+	push dword WINNERMSG
 	push dword 1
 	sub esp, 4
 	int 0x80
