@@ -9,6 +9,11 @@ section .data
 	NEWLINE: db 0xa, 0xd
 	NEWLINELENGTH: equ $-NEWLINE
 	WINNERMSG: db "Winner", 0
+	XTURNPROMPT: db "X, it your turn", 0, 10
+	XTURNPROMPTLEN: equ $ - XTURNPROMPT
+	OTURNPROMPT: db "O, it your turn", 0, 10
+	OTURNPROMPTLEN: equ $ - OTURNPROMPT
+
 
 section .bss
 	INPUT: resd 10
@@ -25,12 +30,19 @@ start:
 	jmp gameLoop
 
 gameLoop:
+	call printXPrompt
 	call readInput
-	call updateBoard
+	call updateXBoard
+	call checkWinner
+	call printBoard
+	call printOPrompt
+	call readInput
+	call updateOBoard
 	call checkWinner
 	call printBoard
 	jmp gameLoop
 
+	
 checkWinner:
 	mov eax, [BOARD]
 	and eax, 0x00FFFFFF ;get the first 3 characters
@@ -113,6 +125,28 @@ printWinner:
 	add esp, 16
 	ret
 
+printXPrompt:
+	mov eax, 4 
+	push dword XTURNPROMPTLEN 
+	push dword XTURNPROMPT
+	push dword 1
+	sub esp, 4
+	int 0x80
+	add esp, 16
+	ret
+
+
+printOPrompt:
+	mov eax, 4
+ 	push dword OTURNPROMPTLEN 
+	push dword OTURNPROMPT
+	push dword 1
+	sub esp, 4
+	int 0x80
+	add esp, 16
+	ret
+
+
 readInput:
 	push dword 10
 	push dword INPUT
@@ -123,7 +157,7 @@ readInput:
 	add esp,16
 	ret
 
-updateBoard:
+updateXBoard:
 	mov eax, 0
 	mov al, [INPUT]
 	sub eax, 48 ; char to int
@@ -131,6 +165,16 @@ updateBoard:
 	add eax, ebx
 	mov byte [eax], 'X'
 	ret
+
+updateOBoard:
+	mov eax, 0
+	mov al, [INPUT]
+	sub eax, 48 ; char to int
+	mov ebx, BOARD
+	add eax, ebx
+	mov byte [eax], 'O'
+	ret
+
 
 finish:
 	push dword 0
