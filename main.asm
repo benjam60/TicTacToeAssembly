@@ -44,7 +44,31 @@ gameLoop:
 checkWinner:
 	call checkHorizontalWinner
 	call checkVerticalWinner
+	call checkDiagonal
 	ret
+
+checkDiagonal:
+	xor eax, eax
+	mov al, [BOARD] ;get first column first row
+	shl eax, 8
+	mov al, [BOARD + 4] ;get first column 2nd row
+	shl eax, 8
+	mov al, [BOARD + 8] ;get first column 3rd row
+	cmp eax, 0x00585858
+	je XWinner
+	cmp eax, 0x004F4F4F
+	je OWinner
+	xor eax, eax
+	mov al, [BOARD + 2] ;get first column first row
+	shl eax, 8
+	mov al, [BOARD + 4] ;get first column 2nd row
+	shl eax, 8
+	mov al, [BOARD + 6] ;get first column 3rd row
+	cmp eax, 0x00585858
+	je XWinner
+	cmp eax, 0x004F4F4F
+	je OWinner
+
 
 checkHorizontalWinner:
 	mov eax, BOARD
