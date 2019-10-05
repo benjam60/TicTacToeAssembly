@@ -1,4 +1,3 @@
-
 %define  ReadFileDescriptor  0
 
 section .data
@@ -8,12 +7,12 @@ section .data
 	EMPTY: dd 95
 	NEWLINE: db 0xa, 0xd
 	NEWLINELENGTH: equ $-NEWLINE
-	WINNERMSG: db "Winner", 0
+	XWINNERMSG: db "X is Winner", 0
+	OWINNERMSG: db "O is Winner", 0
 	XTURNPROMPT: db "X, it your turn", 0, 10
 	XTURNPROMPTLEN: equ $ - XTURNPROMPT
 	OTURNPROMPT: db "O, it your turn", 0, 10
 	OTURNPROMPTLEN: equ $ - OTURNPROMPT
-
 
 section .bss
 	INPUT: resd 10
@@ -41,17 +40,27 @@ gameLoop:
 	call checkWinner
 	call printBoard
 	jmp gameLoop
-
 	
 checkWinner:
-	mov eax, [BOARD]
-	and eax, 0x00FFFFFF ;get the first 3 characters
-	cmp eax, 0x00585858 ; compare to row of Xs
-	je winner
-	cmp eax, 0x004F4F4F ; compare to row of Os
-	je winner
+	call checkHorizontalWinner
 	call checkVerticalWinner
 	ret
+
+checkHorizontalWinner:
+	mov eax, BOARD
+	call hWinnerLoop
+	ret
+hWinnerLoop:
+	mov ebx, [eax]
+	and ebx, 0x00FFFFFF ;get the first 3 characters
+	cmp ebx, 0x00585858 ; compare to row of Xs
+	je XWinner
+	cmp ebx, 0x004F4F4F ; compare to row of Os
+	je OWinner
+	add eax, 3
+	cmp eax, BOARD + 9
+ 	jne hWinnerLoop
+	ret	
 
 checkVerticalWinner:
 	xor esi, esi    ; zero out counter
@@ -65,17 +74,24 @@ vWinnerLoop:
 	shl eax, 8
 	mov al, [BOARD + 6 + esi ] ;get first column 3rd row
 	cmp eax, 0x00585858
-	je winner
+	je XWinner
 	cmp eax, 0x004F4F4F
-	je winner
+	je OWinner
 	inc esi
 	cmp esi, 3 ; loop through 3 times
 	jne vWinnerLoop
 	ret
 
-winner:
+XWinner:
 	call printBoard
-	call printWinner
+	call printXWinner
+	call printNewLine
+	jmp finish
+
+OWinner:
+	call printBoard
+	call printOWinner
+	call printNewLine
 	jmp finish
 
 initializeBoard:
@@ -122,10 +138,20 @@ printNewLine:
 	add esp, 16
 	ret
 
-printWinner:
+printXWinner:
 	mov eax, 4 
-	push dword 7 
-	push dword WINNERMSG
+	push dword 11 
+	push dword XWINNERMSG
+	push dword 1
+	sub esp, 4
+	int 0x80
+	add esp, 16
+	ret
+
+printOWinner:
+	mov eax, 4 
+	push dword 11
+	push dword OWINNERMSG
 	push dword 1
 	sub esp, 4
 	int 0x80
@@ -142,7 +168,6 @@ printXPrompt:
 	add esp, 16
 	ret
 
-
 printOPrompt:
 	mov eax, 4
  	push dword OTURNPROMPTLEN 
@@ -152,7 +177,6 @@ printOPrompt:
 	int 0x80
 	add esp, 16
 	ret
-
 
 readInput:
 	push dword 10
@@ -181,7 +205,6 @@ updateOBoard:
 	add eax, ebx
 	mov byte [eax], 'O'
 	ret
-
 
 finish:
 	push dword 0
