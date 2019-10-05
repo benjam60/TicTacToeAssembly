@@ -54,16 +54,23 @@ checkWinner:
 	ret
 
 checkVerticalWinner:
-	mov eax, 0
-	mov al, [BOARD] ;get first column first row
+	xor esi, esi    ; zero out counter
+	call vWinnerLoop
+	ret
+vWinnerLoop:
+	xor eax, eax
+	mov al, [BOARD + esi] ;get first column first row
 	shl eax, 8
-	mov al, [BOARD + 3] ;get first column 2nd row
+	mov al, [BOARD + 3 + esi] ;get first column 2nd row
 	shl eax, 8
-	mov al, [BOARD + 6] ;get first column 3rd row
+	mov al, [BOARD + 6 + esi ] ;get first column 3rd row
 	cmp eax, 0x00585858
 	je winner
 	cmp eax, 0x004F4F4F
 	je winner
+	inc esi
+	cmp esi, 3 ; loop through 3 times
+	jne vWinnerLoop
 	ret
 
 winner:
